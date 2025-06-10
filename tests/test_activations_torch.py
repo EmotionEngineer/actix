@@ -1,4 +1,5 @@
 # tests/test_activations_torch.py
+
 import pytest
 import numpy as np
 
@@ -17,7 +18,9 @@ try:
         WeibullSoftplusActivationTorch, AdaptiveErfSwishTorch, ParametricBetaSoftsignTorch,
         ParametricArcSinhGateTorch, GeneralizedAlphaSigmoidTorch, RiemannianSoftsignActivationTorch,
         QuantumTanhActivationTorch, LogExponentialActivationTorch, BipolarGaussianArctanActivationTorch,
-        EllipticGaussianActivationTorch, ExpArcTanHarmonicActivationTorch, LogisticWActivationTorch
+        EllipticGaussianActivationTorch, ExpArcTanHarmonicActivationTorch, LogisticWActivationTorch,
+        ParametricTanhSwishTorch, GeneralizedHarmonicSwishTorch, A_STReLUTorch, ETUTorch, PMGLUTorch,
+        GPOSoftTorch, SHLUTorch, GaussSwishTorch, ATanSigUTorch, PAPGTorch
     )
     from actix import get_activation
     torch_available = True
@@ -35,7 +38,9 @@ ALL_TORCH_ACTIVATION_CLASSES = [
     WeibullSoftplusActivationTorch, AdaptiveErfSwishTorch, ParametricBetaSoftsignTorch,
     ParametricArcSinhGateTorch, GeneralizedAlphaSigmoidTorch, RiemannianSoftsignActivationTorch,
     QuantumTanhActivationTorch, LogExponentialActivationTorch, BipolarGaussianArctanActivationTorch,
-    EllipticGaussianActivationTorch, ExpArcTanHarmonicActivationTorch, LogisticWActivationTorch
+    EllipticGaussianActivationTorch, ExpArcTanHarmonicActivationTorch, LogisticWActivationTorch,
+    ParametricTanhSwishTorch, GeneralizedHarmonicSwishTorch, A_STReLUTorch, ETUTorch, PMGLUTorch,
+    GPOSoftTorch, SHLUTorch, GaussSwishTorch, ATanSigUTorch, PAPGTorch
 ]
 
 @pytest.mark.skipif(not torch_available, reason="PyTorch not installed")
@@ -56,8 +61,8 @@ def test_torch_activation_output_properties(activation_class):
 @pytest.mark.skipif(not torch_available, reason="PyTorch not installed")
 def test_get_activation_torch_custom():
     """Tests the get_activation function for a custom Torch activation."""
-    act = get_activation('ParametricLambertWActivation', framework='torch')
-    assert isinstance(act, ParametricLambertWActivationTorch)
+    act = get_activation('PAPG', framework='torch')
+    assert isinstance(act, PAPGTorch)
 
 @pytest.mark.skipif(not torch_available, reason="PyTorch not installed")
 def test_get_activation_torch_standard():

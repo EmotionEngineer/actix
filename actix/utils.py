@@ -1,4 +1,5 @@
 # actix/utils.py
+
 import numpy as np
 
 __all__ = ['plot_activation', 'plot_derivative']

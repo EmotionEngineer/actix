@@ -34,7 +34,9 @@ if _TF_AVAILABLE:
         WeibullSoftplusActivation, AdaptiveErfSwish, ParametricBetaSoftsign,
         ParametricArcSinhGate, GeneralizedAlphaSigmoid, RiemannianSoftsignActivation,
         QuantumTanhActivation, LogExponentialActivation, BipolarGaussianArctanActivation,
-        EllipticGaussianActivation, ExpArcTanHarmonicActivation, LogisticWActivation
+        EllipticGaussianActivation, ExpArcTanHarmonicActivation, LogisticWActivation,
+        ParametricTanhSwish, GeneralizedHarmonicSwish, A_STReLU, ETU, PMGLU,
+        GPOSoft, SHLU, GaussSwish, ATanSigU, PAPG
     )
     # Dictionary for convenient access by string name in TensorFlow
     tf_activations_map = {
@@ -64,6 +66,16 @@ if _TF_AVAILABLE:
         'EllipticGaussianActivation': EllipticGaussianActivation,
         'ExpArcTanHarmonicActivation': ExpArcTanHarmonicActivation,
         'LogisticWActivation': LogisticWActivation,
+        'ParametricTanhSwish': ParametricTanhSwish,
+        'GeneralizedHarmonicSwish': GeneralizedHarmonicSwish,
+        'A_STReLU': A_STReLU,
+        'ETU': ETU,
+        'PMGLU': PMGLU,
+        'GPOSoft': GPOSoft,
+        'SHLU': SHLU,
+        'GaussSwish': GaussSwish,
+        'ATanSigU': ATanSigU,
+        'PAPG': PAPG,
     }
 else:
     tf_activations_map = {}
@@ -82,7 +94,9 @@ if _TORCH_AVAILABLE:
         WeibullSoftplusActivationTorch, AdaptiveErfSwishTorch, ParametricBetaSoftsignTorch,
         ParametricArcSinhGateTorch, GeneralizedAlphaSigmoidTorch, RiemannianSoftsignActivationTorch,
         QuantumTanhActivationTorch, LogExponentialActivationTorch, BipolarGaussianArctanActivationTorch,
-        EllipticGaussianActivationTorch, ExpArcTanHarmonicActivationTorch, LogisticWActivationTorch
+        EllipticGaussianActivationTorch, ExpArcTanHarmonicActivationTorch, LogisticWActivationTorch,
+        ParametricTanhSwishTorch, GeneralizedHarmonicSwishTorch, A_STReLUTorch, ETUTorch, PMGLUTorch,
+        GPOSoftTorch, SHLUTorch, GaussSwishTorch, ATanSigUTorch, PAPGTorch
     )
     # Dictionary for convenient access by string name in PyTorch
     torch_activations_map = {
@@ -112,6 +126,16 @@ if _TORCH_AVAILABLE:
         'EllipticGaussianActivation': EllipticGaussianActivationTorch,
         'ExpArcTanHarmonicActivation': ExpArcTanHarmonicActivationTorch,
         'LogisticWActivation': LogisticWActivationTorch,
+        'ParametricTanhSwish': ParametricTanhSwishTorch,
+        'GeneralizedHarmonicSwish': GeneralizedHarmonicSwishTorch,
+        'A_STReLU': A_STReLUTorch,
+        'ETU': ETUTorch,
+        'PMGLU': PMGLUTorch,
+        'GPOSoft': GPOSoftTorch,
+        'SHLU': SHLUTorch,
+        'GaussSwish': GaussSwishTorch,
+        'ATanSigU': ATanSigUTorch,
+        'PAPG': PAPGTorch,
     }
 else:
     torch_activations_map = {}
@@ -175,11 +199,10 @@ def get_activation(name: str, framework: str = 'tensorflow'):
 
 
 # --- Exports ---
-# Moved utility import to the end to prevent circular import
 from .utils import plot_activation, plot_derivative
 
 __all__ = ['get_activation', 'plot_activation', 'plot_derivative']
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 if _TF_AVAILABLE:
     for act_name, act_class in tf_activations_map.items():

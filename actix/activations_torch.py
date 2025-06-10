@@ -1,4 +1,5 @@
 # actix/activations_torch.py
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -47,9 +48,9 @@ class OptimATorch(nn.Module):
         super(OptimATorch, self).__init__()
         self.alpha = nn.Parameter(torch.ones(1))
         self.beta = nn.Parameter(torch.full((1,), 0.5))
-        self.gamma_param = nn.Parameter(torch.ones(1)) # Renamed to avoid confusion with other gamma
+        self.gamma_param = nn.Parameter(torch.ones(1))
         self.delta = nn.Parameter(torch.full((1,), 0.5))
-        self.lambda_param = nn.Parameter(torch.ones(1)) # lambda is a keyword
+        self.lambda_param = nn.Parameter(torch.ones(1))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         term1 = self.alpha * torch.tanh(self.beta * x)
@@ -63,7 +64,7 @@ class ParametricPolyTanhTorch(nn.Module):
         self.alpha = nn.Parameter(torch.ones(1))
         self.beta = nn.Parameter(torch.ones(1))
         self.gamma = nn.Parameter(torch.zeros(1))
-        self.delta_param = nn.Parameter(torch.zeros(1)) # Renamed to avoid confusion
+        self.delta_param = nn.Parameter(torch.zeros(1))
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.alpha * torch.tanh(self.beta * torch.square(x) + self.gamma * x + self.delta_param)
 
@@ -73,7 +74,7 @@ class AdaptiveRationalSoftsignTorch(nn.Module):
         super(AdaptiveRationalSoftsignTorch, self).__init__()
         self.alpha = nn.Parameter(torch.ones(1))
         self.beta = nn.Parameter(torch.ones(1))
-        self.gamma_param = nn.Parameter(torch.full((1,), 2.0)) # Renamed
+        self.gamma_param = nn.Parameter(torch.full((1,), 2.0))
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return (self.alpha * x) / (1.0 + torch.pow(torch.abs(self.beta * x), self.gamma_param))
 
@@ -83,7 +84,7 @@ class OptimXTemporalTorch(nn.Module):
         super(OptimXTemporalTorch, self).__init__()
         self.alpha = nn.Parameter(torch.full((1,), 0.5))
         self.beta = nn.Parameter(torch.ones(1))
-        self.gamma_param = nn.Parameter(torch.full((1,), 0.5)) # Renamed
+        self.gamma_param = nn.Parameter(torch.full((1,), 0.5))
         self.delta = nn.Parameter(torch.ones(1))
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.alpha * torch.tanh(self.beta * x) + self.gamma_param * torch.sigmoid(self.delta * x)
@@ -104,7 +105,7 @@ class LearnableFourierActivationTorch(nn.Module):
         self.alpha = nn.Parameter(torch.ones(1))
         self.beta = nn.Parameter(torch.ones(1))
         self.gamma_shift = nn.Parameter(torch.zeros(1))
-        self.delta_param = nn.Parameter(torch.ones(1)) # Renamed
+        self.delta_param = nn.Parameter(torch.ones(1))
         self.lambda_param = nn.Parameter(torch.ones(1))
         self.phi = nn.Parameter(torch.zeros(1))
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -118,7 +119,7 @@ class A_ELuCTorch(nn.Module):
         super(A_ELuCTorch, self).__init__()
         self.alpha = nn.Parameter(torch.full((1,), 0.5))
         self.beta = nn.Parameter(torch.ones(1))
-        self.gamma_param = nn.Parameter(torch.full((1,), 0.5)) # Renamed
+        self.gamma_param = nn.Parameter(torch.full((1,), 0.5))
         self.delta = nn.Parameter(torch.ones(1))
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         term1 = self.alpha * F.elu(self.beta * x)
@@ -297,6 +298,139 @@ class EllipticGaussianActivationTorch(nn.Module):
         cn_val = torch_ellipj_cn(x, m_clamped)
         return x * torch.exp(-cn_val)
 
+class ParametricTanhSwishTorch(nn.Module):
+    """f(x) = alpha * x * tanh(beta * x) * sigmoid(gamma * x)"""
+    def __init__(self):
+        super(ParametricTanhSwishTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.alpha * x * torch.tanh(self.beta * x) * torch.sigmoid(self.gamma * x)
+
+class GeneralizedHarmonicSwishTorch(nn.Module):
+    """f(x) = alpha * x * sin(beta * x^2 + gamma) * sigmoid(delta * x)"""
+    def __init__(self):
+        super(GeneralizedHarmonicSwishTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.zeros(1))
+        self.delta = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        harmonic_part = torch.sin(self.beta * torch.square(x) + self.gamma)
+        swish_gate = x * torch.sigmoid(self.delta * x)
+        return self.alpha * swish_gate * harmonic_part
+
+class A_STReLUTorch(nn.Module):
+    """f(x) = alpha * ReLU(x) + beta * x * sigmoid(gamma * x) + delta * tanh(lambda * x)"""
+    def __init__(self):
+        super(A_STReLUTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.full((1,), 0.33))
+        self.beta = nn.Parameter(torch.full((1,), 0.33))
+        self.gamma = nn.Parameter(torch.ones(1))
+        self.delta = nn.Parameter(torch.full((1,), 0.33))
+        self.lambda_param = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        relu_part = self.alpha * F.relu(x)
+        swish_part = self.beta * x * torch.sigmoid(self.gamma * x)
+        tanh_part = self.delta * torch.tanh(self.lambda_param * x)
+        return relu_part + swish_part + tanh_part
+
+class ETUTorch(nn.Module):
+    """ExponentialTanhUnit: f(x) = alpha * tanh(beta * x) * exp(-gamma * x^2)"""
+    def __init__(self):
+        super(ETUTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.alpha * torch.tanh(self.beta * x) * torch.exp(-self.gamma * torch.square(x))
+
+class PMGLUTorch(nn.Module):
+    """Parametric Multi-Gated Linear Unit: f(x) = (alpha * x + beta) * sigmoid(gamma * x + delta) * tanh(lambda * x)"""
+    def __init__(self):
+        super(PMGLUTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.zeros(1))
+        self.gamma = nn.Parameter(torch.ones(1))
+        self.delta = nn.Parameter(torch.zeros(1))
+        self.lambda_param = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        linear_part = self.alpha * x + self.beta
+        sigmoid_gate = torch.sigmoid(self.gamma * x + self.delta)
+        tanh_gate = torch.tanh(self.lambda_param * x)
+        return linear_part * sigmoid_gate * tanh_gate
+
+class GPOSoftTorch(nn.Module):
+    """Generalized Parametric Oscillatory Softplus: f(x) = alpha * softplus(beta * x) + gamma * sin(delta * x + lambda)"""
+    def __init__(self):
+        super(GPOSoftTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.ones(1))
+        self.delta = nn.Parameter(torch.ones(1))
+        self.lambda_param = nn.Parameter(torch.zeros(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        softplus_part = self.alpha * F.softplus(self.beta * x)
+        oscillatory_part = self.gamma * torch.sin(self.delta * x + self.lambda_param)
+        return softplus_part + oscillatory_part
+
+class SHLUTorch(nn.Module):
+    """Sigmoid-Harmonic Linear Unit: f(x)= (alpha * x) * sigmoid(beta * x) + gamma * cos(delta * x^2 + lambda)"""
+    def __init__(self):
+        super(SHLUTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.ones(1))
+        self.delta = nn.Parameter(torch.ones(1))
+        self.lambda_param = nn.Parameter(torch.zeros(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        swish_part = self.alpha * x * torch.sigmoid(self.beta * x)
+        harmonic_part = self.gamma * torch.cos(self.delta * torch.square(x) + self.lambda_param)
+        return swish_part + harmonic_part
+
+class GaussSwishTorch(nn.Module):
+    """Gaussian Parametric Swish: f(x) = (alpha * x) * sigmoid(beta * x) * exp(-gamma * x^2)"""
+    def __init__(self):
+        super(GaussSwishTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        swish_part = self.alpha * x * torch.sigmoid(self.beta * x)
+        gaussian_part = torch.exp(-self.gamma * torch.square(x))
+        return swish_part * gaussian_part
+
+class ATanSigUTorch(nn.Module):
+    """Adaptive ArcTanSigmoid Unit: f(x) = alpha * arctan(beta * x) + gamma * x * sigmoid(delta * x)"""
+    def __init__(self):
+        super(ATanSigUTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.ones(1))
+        self.delta = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        arctan_part = self.alpha * torch.atan(self.beta * x)
+        swish_part = self.gamma * x * torch.sigmoid(self.delta * x)
+        return arctan_part + swish_part
+
+class PAPGTorch(nn.Module):
+    """Parametric Adaptive Polynomial Gate: f(x) = (alpha * x + beta * x^3) / (1 + |gamma * x|^delta) + lambda * x * sigmoid(mu * x)"""
+    def __init__(self):
+        super(PAPGTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.ones(1))
+        self.delta = nn.Parameter(torch.ones(1))
+        self.lambda_param = nn.Parameter(torch.ones(1))
+        self.mu = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        numerator = self.alpha * x + self.beta * torch.pow(x, 3)
+        denominator = 1.0 + torch.pow(torch.abs(self.gamma * x), self.delta)
+        poly_gate_part = numerator / (denominator + 1e-7)
+        swish_part = self.lambda_param * x * torch.sigmoid(self.mu * x)
+        return poly_gate_part + swish_part
+
 # --- Static Activation Functions (PyTorch Modules for consistency) ---
 
 class SinhGateTorch(nn.Module):
@@ -345,7 +479,7 @@ class LogCoshGateTorch(nn.Module):
     """f(x) = x * log(cosh(x))"""
     def __init__(self): super(LogCoshGateTorch, self).__init__()
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # Add epsilon for numerical stability as log(1) (cosh(0)) is 0, and log can be sensitive near 0.
+        # Add epsilon for numerical stability
         return x * torch.log(torch.cosh(x) + 1e-7)
 
 class TanhArcTorch(nn.Module):

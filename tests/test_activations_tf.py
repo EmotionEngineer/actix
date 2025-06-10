@@ -1,4 +1,5 @@
 # tests/test_activations_tf.py
+
 import pytest
 import numpy as np
 
@@ -15,7 +16,9 @@ try:
         WeibullSoftplusActivation, AdaptiveErfSwish, ParametricBetaSoftsign,
         ParametricArcSinhGate, GeneralizedAlphaSigmoid, RiemannianSoftsignActivation,
         QuantumTanhActivation, LogExponentialActivation, BipolarGaussianArctanActivation,
-        EllipticGaussianActivation, ExpArcTanHarmonicActivation, LogisticWActivation
+        EllipticGaussianActivation, ExpArcTanHarmonicActivation, LogisticWActivation,
+        ParametricTanhSwish, GeneralizedHarmonicSwish, A_STReLU, ETU, PMGLU,
+        GPOSoft, SHLU, GaussSwish, ATanSigU, PAPG
     )
     from actix import get_activation
     tf_available = True
@@ -33,7 +36,9 @@ ALL_TF_ACTIVATION_CLASSES = [
     WeibullSoftplusActivation, AdaptiveErfSwish, ParametricBetaSoftsign,
     ParametricArcSinhGate, GeneralizedAlphaSigmoid, RiemannianSoftsignActivation,
     QuantumTanhActivation, LogExponentialActivation, BipolarGaussianArctanActivation,
-    EllipticGaussianActivation, ExpArcTanHarmonicActivation, LogisticWActivation
+    EllipticGaussianActivation, ExpArcTanHarmonicActivation, LogisticWActivation,
+    ParametricTanhSwish, GeneralizedHarmonicSwish, A_STReLU, ETU, PMGLU,
+    GPOSoft, SHLU, GaussSwish, ATanSigU, PAPG
 ]
 
 @pytest.mark.skipif(not tf_available, reason="TensorFlow not installed")
@@ -55,8 +60,8 @@ def test_tf_activation_output_properties(activation_class):
 @pytest.mark.skipif(not tf_available, reason="TensorFlow not installed")
 def test_get_activation_tf_custom():
     """Tests the get_activation function for a custom TF activation."""
-    act = get_activation('ParametricLambertWActivation', framework='tf')
-    assert isinstance(act, ParametricLambertWActivation)
+    act = get_activation('PAPG', framework='tf')
+    assert isinstance(act, PAPG)
 
 @pytest.mark.skipif(not tf_available, reason="TensorFlow not installed")
 def test_get_activation_tf_standard():
