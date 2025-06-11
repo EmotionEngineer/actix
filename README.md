@@ -13,50 +13,42 @@
 *   **Static Activations:** Novel non-parametric functions.
 *   **Easy to Use:** Simple API to get and use activation functions.
 
-## Implemented Activation Functions
+## Choosing Activation Function
 
-Below is a list of some of the activation functions included in this package. For the full list and their mathematical formulas, please refer to the [`actix/activations_tf.py`](actix/activations_tf.py)
+Based on extensive testing on classification and regression tasks, it's recommended to start with the following activation functions. They have consistently shown superior performance, stability, and versatility compared to standard activations.
 
-**Parametric:**
-*   `OptimA`
-*   `ParametricPolyTanh`
-*   `AdaptiveRationalSoftsign`
-*   `OptimXTemporal`
-*   `ParametricGaussianActivation`
-*   `LearnableFourierActivation`
-*   `A_ELuC` (Adaptive Exponential Linear Combination)
-*   `ParametricSmoothStep`
-*   `AdaptiveBiHyperbolic`
-*   `ParametricLogish` (Parametric Swish/SiLU)
-*   `AdaptSigmoidReLU`
-*   `ParametricLambertWActivation`
-*   `AdaptiveHyperbolicLogarithm`
-*   `ParametricGeneralizedGompertzActivation`
-*   `ComplexHarmonicActivation`
-*   `WeibullSoftplusActivation`
-*   `AdaptiveErfSwish`
-*   `ParametricBetaSoftsign`
-*   `ParametricArcSinhGate`
-*   `GeneralizedAlphaSigmoid`
-*   `EllipticGaussianActivation`
+For a complete list of all 40+ implemented functions and their mathematical formulas, please refer to the source code: [`actix/activations_tf.py`](actix/activations_tf.py)
 
-**Static:**
-*   `SinhGate`
-*   `SoftRBF`
-*   `ATanSigmoid`
-*   `ExpoSoft`
-*   `HarmonicTanh`
-*   `RationalSoftplus`
-*   `UnifiedSineExp`
-*   `SigmoidErf`
-*   `LogCoshGate`
-*   `TanhArc`
-*   `RiemannianSoftsignActivation`
-*   `QuantumTanhActivation`
-*   `LogExponentialActivation`
-*   `BipolarGaussianArctanActivation`
-*   `ExpArcTanHarmonicActivation`
-*   `LogisticWActivation`
+### Universal Performers (Best All-Rounders)
+
+If you need a single function that works exceptionally well across most tasks, choose one of these.
+
+*   **`OptimA`**: **The Go-To Choice.** This function was the clear winner in regression tasks and a top-tier performer in classification. Its combination of `tanh` and gated `softplus` provides a powerful and flexible non-linearity.
+*   **`A_ELuC`**: **A Powerful & Versatile Alternative.** Often the best performer in classification and very strong in regression. It combines the benefits of `ELU` with a gating mechanism, making it highly effective.
+
+### Top Choices for Classification
+
+If your primary task is classification (e.g., image recognition), the following options are recommended in order of preference:
+
+1.  **`A_ELuC`**: Showed the highest accuracy in several tests, outperforming even modern standards like `gelu` and `swish`.
+2.  **`ParametricLogish`**: A simple but highly effective parametric version of Swish (`x * sigmoid(x)`). A great, lightweight replacement for `swish` or `gelu` that often performs better.
+3.  **`OptimA`**: While it shines brightest in regression, its performance in classification is also excellent and highly reliable.
+
+### Top Choices for Regression
+
+For regression tasks (e.g., predicting house prices or other continuous values):
+
+1.  **`OptimA`**: The undisputed champion in our regression benchmarks. Consistently delivered the lowest error rates and should be your first choice.
+2.  **`OptimXTemporal`**: A slightly simpler version of `OptimA` that also achieves top-tier performance. A great, efficient choice for regression.
+3.  **`A_STReLU`** / **`ATanSigU`**: Both functions demonstrated excellent and stable results on tabular regression datasets, making them strong candidates.
+
+### Experimental & Specialized Functions
+
+These functions can provide exceptional results on specific tasks but may be less stable or require more tuning. Use them when standard approaches are not sufficient.
+
+*   **`ComplexHarmonicActivation`**: A "secret weapon" for specific regression datasets but can be highly unstable on others. High risk, high reward.
+*   **`WeibullSoftplusActivation`**: A consistent and reliable performer that, while not always #1, is a very safe and solid choice across different tasks.
+*   **`GeneralizedAlphaSigmoid`**: Showed strong potential in specific regression scenarios, making it worth a try if the top contenders don't yield desired results.
 
 ## Performance Highlights
 
