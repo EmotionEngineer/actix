@@ -20,7 +20,13 @@ try:
         QuantumTanhActivationTorch, LogExponentialActivationTorch, BipolarGaussianArctanActivationTorch,
         EllipticGaussianActivationTorch, ExpArcTanHarmonicActivationTorch, LogisticWActivationTorch,
         ParametricTanhSwishTorch, GeneralizedHarmonicSwishTorch, A_STReLUTorch, ETUTorch, PMGLUTorch,
-        GPOSoftTorch, SHLUTorch, GaussSwishTorch, ATanSigUTorch, PAPGTorch
+        GPOSoftTorch, SHLUTorch, GaussSwishTorch, ATanSigUTorch, PAPGTorch,
+        SwishLogTanhTorch, ArcGaLUTorch, ParametricHyperbolicQuadraticActivationTorch, RootSoftplusTorch,
+        AdaptiveSinusoidalSoftgateTorch, ExpTanhGatedActivationTorch, HybridSinExpUnitTorch,
+        ParametricLogarithmicSwishTorch, AdaptiveCubicSigmoidTorch, SmoothedAbsoluteGatedUnitTorch,
+        GaussianTanhHarmonicUnitTorch, SymmetricParametricRationalSigmoidTorch, AdaptivePolynomialSwishTorch,
+        LogSigmoidGatedEluTorch, AdaptiveBipolarExponentialUnitTorch, ParametricHyperGaussianGateTorch,
+        TanhGatedArcsinhLinearUnitTorch, ParametricOddPowerSwishTorch, AdaptiveLinearLogTanhTorch
     )
     from actix import get_activation
     torch_available = True
@@ -40,7 +46,13 @@ ALL_TORCH_ACTIVATION_CLASSES = [
     QuantumTanhActivationTorch, LogExponentialActivationTorch, BipolarGaussianArctanActivationTorch,
     EllipticGaussianActivationTorch, ExpArcTanHarmonicActivationTorch, LogisticWActivationTorch,
     ParametricTanhSwishTorch, GeneralizedHarmonicSwishTorch, A_STReLUTorch, ETUTorch, PMGLUTorch,
-    GPOSoftTorch, SHLUTorch, GaussSwishTorch, ATanSigUTorch, PAPGTorch
+    GPOSoftTorch, SHLUTorch, GaussSwishTorch, ATanSigUTorch, PAPGTorch,
+    SwishLogTanhTorch, ArcGaLUTorch, ParametricHyperbolicQuadraticActivationTorch, RootSoftplusTorch,
+    AdaptiveSinusoidalSoftgateTorch, ExpTanhGatedActivationTorch, HybridSinExpUnitTorch,
+    ParametricLogarithmicSwishTorch, AdaptiveCubicSigmoidTorch, SmoothedAbsoluteGatedUnitTorch,
+    GaussianTanhHarmonicUnitTorch, SymmetricParametricRationalSigmoidTorch, AdaptivePolynomialSwishTorch,
+    LogSigmoidGatedEluTorch, AdaptiveBipolarExponentialUnitTorch, ParametricHyperGaussianGateTorch,
+    TanhGatedArcsinhLinearUnitTorch, ParametricOddPowerSwishTorch, AdaptiveLinearLogTanhTorch
 ]
 
 @pytest.mark.skipif(not torch_available, reason="PyTorch not installed")
@@ -61,8 +73,8 @@ def test_torch_activation_output_properties(activation_class):
 @pytest.mark.skipif(not torch_available, reason="PyTorch not installed")
 def test_get_activation_torch_custom():
     """Tests the get_activation function for a custom Torch activation."""
-    act = get_activation('PAPG', framework='torch')
-    assert isinstance(act, PAPGTorch)
+    act = get_activation('SwishLogTanh', framework='torch')
+    assert isinstance(act, SwishLogTanhTorch)
 
 @pytest.mark.skipif(not torch_available, reason="PyTorch not installed")
 def test_get_activation_torch_standard():

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "actix"
-version = "0.3.0"
+version = "0.4.0"
 authors = [
     { name="Islam Tlupov", email="tlupovislam@gmail.com" },
 ]

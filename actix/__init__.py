@@ -36,7 +36,13 @@ if _TF_AVAILABLE:
         QuantumTanhActivation, LogExponentialActivation, BipolarGaussianArctanActivation,
         EllipticGaussianActivation, ExpArcTanHarmonicActivation, LogisticWActivation,
         ParametricTanhSwish, GeneralizedHarmonicSwish, A_STReLU, ETU, PMGLU,
-        GPOSoft, SHLU, GaussSwish, ATanSigU, PAPG
+        GPOSoft, SHLU, GaussSwish, ATanSigU, PAPG,
+        SwishLogTanh, ArcGaLU, ParametricHyperbolicQuadraticActivation, RootSoftplus,
+        AdaptiveSinusoidalSoftgate, ExpTanhGatedActivation, HybridSinExpUnit,
+        ParametricLogarithmicSwish, AdaptiveCubicSigmoid, SmoothedAbsoluteGatedUnit,
+        GaussianTanhHarmonicUnit, SymmetricParametricRationalSigmoid, AdaptivePolynomialSwish,
+        LogSigmoidGatedElu, AdaptiveBipolarExponentialUnit, ParametricHyperGaussianGate,
+        TanhGatedArcsinhLinearUnit, ParametricOddPowerSwish, AdaptiveLinearLogTanh
     )
     # Dictionary for convenient access by string name in TensorFlow
     tf_activations_map = {
@@ -76,6 +82,25 @@ if _TF_AVAILABLE:
         'GaussSwish': GaussSwish,
         'ATanSigU': ATanSigU,
         'PAPG': PAPG,
+        'SwishLogTanh': SwishLogTanh,
+        'ArcGaLU': ArcGaLU,
+        'ParametricHyperbolicQuadraticActivation': ParametricHyperbolicQuadraticActivation,
+        'RootSoftplus': RootSoftplus,
+        'AdaptiveSinusoidalSoftgate': AdaptiveSinusoidalSoftgate,
+        'ExpTanhGatedActivation': ExpTanhGatedActivation,
+        'HybridSinExpUnit': HybridSinExpUnit,
+        'ParametricLogarithmicSwish': ParametricLogarithmicSwish,
+        'AdaptiveCubicSigmoid': AdaptiveCubicSigmoid,
+        'SmoothedAbsoluteGatedUnit': SmoothedAbsoluteGatedUnit,
+        'GaussianTanhHarmonicUnit': GaussianTanhHarmonicUnit,
+        'SymmetricParametricRationalSigmoid': SymmetricParametricRationalSigmoid,
+        'AdaptivePolynomialSwish': AdaptivePolynomialSwish,
+        'LogSigmoidGatedElu': LogSigmoidGatedElu,
+        'AdaptiveBipolarExponentialUnit': AdaptiveBipolarExponentialUnit,
+        'ParametricHyperGaussianGate': ParametricHyperGaussianGate,
+        'TanhGatedArcsinhLinearUnit': TanhGatedArcsinhLinearUnit,
+        'ParametricOddPowerSwish': ParametricOddPowerSwish,
+        'AdaptiveLinearLogTanh': AdaptiveLinearLogTanh,
     }
 else:
     tf_activations_map = {}
@@ -96,7 +121,13 @@ if _TORCH_AVAILABLE:
         QuantumTanhActivationTorch, LogExponentialActivationTorch, BipolarGaussianArctanActivationTorch,
         EllipticGaussianActivationTorch, ExpArcTanHarmonicActivationTorch, LogisticWActivationTorch,
         ParametricTanhSwishTorch, GeneralizedHarmonicSwishTorch, A_STReLUTorch, ETUTorch, PMGLUTorch,
-        GPOSoftTorch, SHLUTorch, GaussSwishTorch, ATanSigUTorch, PAPGTorch
+        GPOSoftTorch, SHLUTorch, GaussSwishTorch, ATanSigUTorch, PAPGTorch,
+        SwishLogTanhTorch, ArcGaLUTorch, ParametricHyperbolicQuadraticActivationTorch, RootSoftplusTorch,
+        AdaptiveSinusoidalSoftgateTorch, ExpTanhGatedActivationTorch, HybridSinExpUnitTorch,
+        ParametricLogarithmicSwishTorch, AdaptiveCubicSigmoidTorch, SmoothedAbsoluteGatedUnitTorch,
+        GaussianTanhHarmonicUnitTorch, SymmetricParametricRationalSigmoidTorch, AdaptivePolynomialSwishTorch,
+        LogSigmoidGatedEluTorch, AdaptiveBipolarExponentialUnitTorch, ParametricHyperGaussianGateTorch,
+        TanhGatedArcsinhLinearUnitTorch, ParametricOddPowerSwishTorch, AdaptiveLinearLogTanhTorch
     )
     # Dictionary for convenient access by string name in PyTorch
     torch_activations_map = {
@@ -136,6 +167,25 @@ if _TORCH_AVAILABLE:
         'GaussSwish': GaussSwishTorch,
         'ATanSigU': ATanSigUTorch,
         'PAPG': PAPGTorch,
+        'SwishLogTanh': SwishLogTanhTorch,
+        'ArcGaLU': ArcGaLUTorch,
+        'ParametricHyperbolicQuadraticActivation': ParametricHyperbolicQuadraticActivationTorch,
+        'RootSoftplus': RootSoftplusTorch,
+        'AdaptiveSinusoidalSoftgate': AdaptiveSinusoidalSoftgateTorch,
+        'ExpTanhGatedActivation': ExpTanhGatedActivationTorch,
+        'HybridSinExpUnit': HybridSinExpUnitTorch,
+        'ParametricLogarithmicSwish': ParametricLogarithmicSwishTorch,
+        'AdaptiveCubicSigmoid': AdaptiveCubicSigmoidTorch,
+        'SmoothedAbsoluteGatedUnit': SmoothedAbsoluteGatedUnitTorch,
+        'GaussianTanhHarmonicUnit': GaussianTanhHarmonicUnitTorch,
+        'SymmetricParametricRationalSigmoid': SymmetricParametricRationalSigmoidTorch,
+        'AdaptivePolynomialSwish': AdaptivePolynomialSwishTorch,
+        'LogSigmoidGatedElu': LogSigmoidGatedEluTorch,
+        'AdaptiveBipolarExponentialUnit': AdaptiveBipolarExponentialUnitTorch,
+        'ParametricHyperGaussianGate': ParametricHyperGaussianGateTorch,
+        'TanhGatedArcsinhLinearUnit': TanhGatedArcsinhLinearUnitTorch,
+        'ParametricOddPowerSwish': ParametricOddPowerSwishTorch,
+        'AdaptiveLinearLogTanh': AdaptiveLinearLogTanhTorch,
     }
 else:
     torch_activations_map = {}
@@ -202,7 +252,7 @@ def get_activation(name: str, framework: str = 'tensorflow'):
 from .utils import plot_activation, plot_derivative
 
 __all__ = ['get_activation', 'plot_activation', 'plot_derivative']
-__version__ = "0.3.0"
+__version__ = "0.4.0" # Bumped version for new features
 
 if _TF_AVAILABLE:
     for act_name, act_class in tf_activations_map.items():

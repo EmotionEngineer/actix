@@ -553,6 +553,304 @@ class PAPG(Layer):
         return poly_gate_part + swish_part
     def get_config(self): return super(PAPG, self).get_config()
 
+class SwishLogTanh(Layer):
+    """f(x) = alpha * x * sigmoid(beta * x) + gamma * tanh(softplus(delta * x))"""
+    def __init__(self, **kwargs):
+        super(SwishLogTanh, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_slt', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_slt', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_slt', shape=(), initializer='ones', trainable=True)
+        self.delta = self.add_weight(name='delta_slt', shape=(), initializer='ones', trainable=True)
+        super(SwishLogTanh, self).build(input_shape)
+    def call(self, x):
+        swish_part = self.alpha * x * tf.math.sigmoid(self.beta * x)
+        log_tanh_part = self.gamma * tf.math.tanh(tf.math.softplus(self.delta * x))
+        return swish_part + log_tanh_part
+    def get_config(self): return super(SwishLogTanh, self).get_config()
+
+class ArcGaLU(Layer):
+    """f(x) = alpha * arctan(beta * x) + gamma * x * sigmoid(delta * x + lambda)"""
+    def __init__(self, **kwargs):
+        super(ArcGaLU, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_arcgalu', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_arcgalu', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_arcgalu', shape=(), initializer='ones', trainable=True)
+        self.delta = self.add_weight(name='delta_arcgalu', shape=(), initializer='ones', trainable=True)
+        self.lambda_ = self.add_weight(name='lambda_arcgalu', shape=(), initializer='zeros', trainable=True)
+        super(ArcGaLU, self).build(input_shape)
+    def call(self, x):
+        arctan_part = self.alpha * tf.math.atan(self.beta * x)
+        gated_linear_part = self.gamma * x * tf.math.sigmoid(self.delta * x + self.lambda_)
+        return arctan_part + gated_linear_part
+    def get_config(self): return super(ArcGaLU, self).get_config()
+
+class ParametricHyperbolicQuadraticActivation(Layer):
+    """f(x) = alpha * tanh(beta * x^2 + gamma * x) + delta * x * sigmoid(lambda * x)"""
+    def __init__(self, **kwargs):
+        super(ParametricHyperbolicQuadraticActivation, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_phqa', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_phqa', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_phqa', shape=(), initializer='zeros', trainable=True)
+        self.delta = self.add_weight(name='delta_phqa', shape=(), initializer='ones', trainable=True)
+        self.lambda_ = self.add_weight(name='lambda_phqa', shape=(), initializer='ones', trainable=True)
+        super(ParametricHyperbolicQuadraticActivation, self).build(input_shape)
+    def call(self, x):
+        tanh_part = self.alpha * tf.math.tanh(self.beta * tf.square(x) + self.gamma * x)
+        swish_part = self.delta * x * tf.math.sigmoid(self.lambda_ * x)
+        return tanh_part + swish_part
+    def get_config(self): return super(ParametricHyperbolicQuadraticActivation, self).get_config()
+
+class RootSoftplus(Layer):
+    """f(x) = alpha * x + beta * sqrt(softplus(gamma * x))"""
+    def __init__(self, **kwargs):
+        super(RootSoftplus, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_rs', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_rs', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_rs', shape=(), initializer='ones', trainable=True)
+        super(RootSoftplus, self).build(input_shape)
+    def call(self, x):
+        linear_part = self.alpha * x
+        root_softplus_part = self.beta * tf.math.sqrt(tf.math.softplus(self.gamma * x) + 1e-7)
+        return linear_part + root_softplus_part
+    def get_config(self): return super(RootSoftplus, self).get_config()
+
+class AdaptiveSinusoidalSoftgate(Layer):
+    """f(x) = alpha * x * sigmoid(beta * x) + gamma * sin(delta * x)"""
+    def __init__(self, **kwargs):
+        super(AdaptiveSinusoidalSoftgate, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_asg', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_asg', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_asg', shape=(), initializer='ones', trainable=True)
+        self.delta = self.add_weight(name='delta_asg', shape=(), initializer='ones', trainable=True)
+        super(AdaptiveSinusoidalSoftgate, self).build(input_shape)
+    def call(self, x):
+        swish_part = self.alpha * x * tf.math.sigmoid(self.beta * x)
+        sin_part = self.gamma * tf.math.sin(self.delta * x)
+        return swish_part + sin_part
+    def get_config(self): return super(AdaptiveSinusoidalSoftgate, self).get_config()
+
+class ExpTanhGatedActivation(Layer):
+    """f(x) = alpha * tanh(beta * x) * sigmoid(gamma * exp(delta * x))"""
+    def __init__(self, **kwargs):
+        super(ExpTanhGatedActivation, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_etg', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_etg', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_etg', shape=(), initializer='ones', trainable=True)
+        self.delta = self.add_weight(name='delta_etg', shape=(), initializer='zeros', trainable=True)
+        super(ExpTanhGatedActivation, self).build(input_shape)
+    def call(self, x):
+        tanh_part = self.alpha * tf.math.tanh(self.beta * x)
+        exp_gate = tf.math.sigmoid(self.gamma * tf.math.exp(self.delta * x))
+        return tanh_part * exp_gate
+    def get_config(self): return super(ExpTanhGatedActivation, self).get_config()
+
+class HybridSinExpUnit(Layer):
+    """f(x) = alpha * sin(beta * x) + gamma * x * exp(-delta * x^2)"""
+    def __init__(self, **kwargs):
+        super(HybridSinExpUnit, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_hseu', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_hseu', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_hseu', shape=(), initializer='ones', trainable=True)
+        self.delta = self.add_weight(name='delta_hseu', shape=(), initializer='ones', trainable=True)
+        super(HybridSinExpUnit, self).build(input_shape)
+    def call(self, x):
+        sin_part = self.alpha * tf.math.sin(self.beta * x)
+        exp_part = self.gamma * x * tf.math.exp(-self.delta * tf.square(x))
+        return sin_part + exp_part
+    def get_config(self): return super(HybridSinExpUnit, self).get_config()
+
+class ParametricLogarithmicSwish(Layer):
+    """f(x) = alpha * x * sigmoid(beta * x) + gamma * log(1 + |delta| * |x|)"""
+    def __init__(self, **kwargs):
+        super(ParametricLogarithmicSwish, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_plogsw', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_plogsw', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_plogsw', shape=(), initializer='ones', trainable=True)
+        self.delta = self.add_weight(name='delta_plogsw', shape=(), initializer='ones', trainable=True)
+        super(ParametricLogarithmicSwish, self).build(input_shape)
+    def call(self, x):
+        swish_part = self.alpha * x * tf.math.sigmoid(self.beta * x)
+        log_part = self.gamma * tf.math.log(1.0 + tf.math.abs(self.delta) * tf.math.abs(x) + 1e-7)
+        return swish_part + log_part
+    def get_config(self): return super(ParametricLogarithmicSwish, self).get_config()
+
+class AdaptiveCubicSigmoid(Layer):
+    """f(x) = alpha * x + beta * x^3 * sigmoid(gamma * x)"""
+    def __init__(self, **kwargs):
+        super(AdaptiveCubicSigmoid, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_acs', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_acs', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_acs', shape=(), initializer='ones', trainable=True)
+        super(AdaptiveCubicSigmoid, self).build(input_shape)
+    def call(self, x):
+        linear_part = self.alpha * x
+        cubic_part = self.beta * tf.math.pow(x, 3) * tf.math.sigmoid(self.gamma * x)
+        return linear_part + cubic_part
+    def get_config(self): return super(AdaptiveCubicSigmoid, self).get_config()
+
+class SmoothedAbsoluteGatedUnit(Layer):
+    """f(x) = alpha * |x| * sigmoid(beta * x) + gamma * x"""
+    def __init__(self, **kwargs):
+        super(SmoothedAbsoluteGatedUnit, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_sagu', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_sagu', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_sagu', shape=(), initializer='ones', trainable=True)
+        super(SmoothedAbsoluteGatedUnit, self).build(input_shape)
+    def call(self, x):
+        gated_abs_part = self.alpha * tf.math.abs(x) * tf.math.sigmoid(self.beta * x)
+        linear_part = self.gamma * x
+        return gated_abs_part + linear_part
+    def get_config(self): return super(SmoothedAbsoluteGatedUnit, self).get_config()
+
+class GaussianTanhHarmonicUnit(Layer):
+    """f(x) = alpha * tanh(beta * x) + gamma * exp(-delta * (x - lambda)^2)"""
+    def __init__(self, **kwargs):
+        super(GaussianTanhHarmonicUnit, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_gthhu', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_gthhu', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_gthhu', shape=(), initializer='ones', trainable=True)
+        self.delta = self.add_weight(name='delta_gthhu', shape=(), initializer='ones', trainable=True)
+        self.lambda_ = self.add_weight(name='lambda_gthhu', shape=(), initializer='zeros', trainable=True)
+        super(GaussianTanhHarmonicUnit, self).build(input_shape)
+    def call(self, x):
+        tanh_part = self.alpha * tf.math.tanh(self.beta * x)
+        gaussian_part = self.gamma * tf.math.exp(-self.delta * tf.square(x - self.lambda_))
+        return tanh_part + gaussian_part
+    def get_config(self): return super(GaussianTanhHarmonicUnit, self).get_config()
+
+class SymmetricParametricRationalSigmoid(Layer):
+    """f(x) = (alpha * x) / (1 + |beta * x^2|^gamma)"""
+    def __init__(self, **kwargs):
+        super(SymmetricParametricRationalSigmoid, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_sprs', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_sprs', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_sprs', shape=(), initializer='ones', trainable=True)
+        super(SymmetricParametricRationalSigmoid, self).build(input_shape)
+    def call(self, x):
+        denominator = 1.0 + tf.pow(tf.abs(self.beta * tf.square(x)), self.gamma)
+        return (self.alpha * x) / (denominator + 1e-7)
+    def get_config(self): return super(SymmetricParametricRationalSigmoid, self).get_config()
+
+class AdaptivePolynomialSwish(Layer):
+    """f(x) = alpha * x * sigmoid(beta * x) + gamma * x^2 * sigmoid(delta * x)"""
+    def __init__(self, **kwargs):
+        super(AdaptivePolynomialSwish, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_apsw', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_apsw', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_apsw', shape=(), initializer='ones', trainable=True)
+        self.delta = self.add_weight(name='delta_apsw', shape=(), initializer='ones', trainable=True)
+        super(AdaptivePolynomialSwish, self).build(input_shape)
+    def call(self, x):
+        swish_part = self.alpha * x * tf.math.sigmoid(self.beta * x)
+        poly_swish_part = self.gamma * tf.square(x) * tf.math.sigmoid(self.delta * x)
+        return swish_part + poly_swish_part
+    def get_config(self): return super(AdaptivePolynomialSwish, self).get_config()
+
+class LogSigmoidGatedElu(Layer):
+    """f(x) = alpha * ELU(beta * x) * softplus(gamma * x) * sigmoid(delta * x)"""
+    def __init__(self, **kwargs):
+        super(LogSigmoidGatedElu, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_lsge', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_lsge', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_lsge', shape=(), initializer='ones', trainable=True)
+        self.delta = self.add_weight(name='delta_lsge', shape=(), initializer='ones', trainable=True)
+        super(LogSigmoidGatedElu, self).build(input_shape)
+    def call(self, x):
+        elu_part = keras_standard_activations.elu(self.beta * x)
+        log_gate = tf.math.softplus(self.gamma * x)
+        sig_gate = tf.math.sigmoid(self.delta * x)
+        return self.alpha * elu_part * log_gate * sig_gate
+    def get_config(self): return super(LogSigmoidGatedElu, self).get_config()
+
+class AdaptiveBipolarExponentialUnit(Layer):
+    """f(x) = alpha * x + beta * x * exp(-gamma * x^2)"""
+    def __init__(self, **kwargs):
+        super(AdaptiveBipolarExponentialUnit, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_abexu', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_abexu', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_abexu', shape=(), initializer='ones', trainable=True)
+        super(AdaptiveBipolarExponentialUnit, self).build(input_shape)
+    def call(self, x):
+        linear_part = self.alpha * x
+        exp_part = self.beta * x * tf.math.exp(-self.gamma * tf.square(x))
+        return linear_part + exp_part
+    def get_config(self): return super(AdaptiveBipolarExponentialUnit, self).get_config()
+
+class ParametricHyperGaussianGate(Layer):
+    """f(x) = alpha * x * exp(-beta * |x|^gamma)"""
+    def __init__(self, **kwargs):
+        super(ParametricHyperGaussianGate, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_phgg', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_phgg', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_phgg', shape=(), initializer='ones', trainable=True)
+        super(ParametricHyperGaussianGate, self).build(input_shape)
+    def call(self, x):
+        gate = tf.math.exp(-tf.abs(self.beta) * tf.pow(tf.abs(x), tf.abs(self.gamma)))
+        return self.alpha * x * gate
+    def get_config(self): return super(ParametricHyperGaussianGate, self).get_config()
+
+class TanhGatedArcsinhLinearUnit(Layer):
+    """f(x) = alpha * x * tanh(beta * asinh(gamma * x))"""
+    def __init__(self, **kwargs):
+        super(TanhGatedArcsinhLinearUnit, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_tgaslu', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_tgaslu', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_tgaslu', shape=(), initializer='ones', trainable=True)
+        super(TanhGatedArcsinhLinearUnit, self).build(input_shape)
+    def call(self, x):
+        gate = tf.math.tanh(self.beta * tf.math.asinh(self.gamma * x))
+        return self.alpha * x * gate
+    def get_config(self): return super(TanhGatedArcsinhLinearUnit, self).get_config()
+
+class ParametricOddPowerSwish(Layer):
+    """f(x) = alpha * x * sigmoid(beta * x) + gamma * x^3"""
+    def __init__(self, **kwargs):
+        super(ParametricOddPowerSwish, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_popsw', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_popsw', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_popsw', shape=(), initializer='ones', trainable=True)
+        super(ParametricOddPowerSwish, self).build(input_shape)
+    def call(self, x):
+        swish_part = self.alpha * x * tf.math.sigmoid(self.beta * x)
+        power_part = self.gamma * tf.math.pow(x, 3)
+        return swish_part + power_part
+    def get_config(self): return super(ParametricOddPowerSwish, self).get_config()
+
+class AdaptiveLinearLogTanh(Layer):
+    """f(x) = alpha * x + beta * tanh(gamma * softplus(delta * x))"""
+    def __init__(self, **kwargs):
+        super(AdaptiveLinearLogTanh, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_allt', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_allt', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_allt', shape=(), initializer='ones', trainable=True)
+        self.delta = self.add_weight(name='delta_allt', shape=(), initializer='ones', trainable=True)
+        super(AdaptiveLinearLogTanh, self).build(input_shape)
+    def call(self, x):
+        linear_part = self.alpha * x
+        log_tanh_part = self.beta * tf.math.tanh(self.gamma * tf.math.softplus(self.delta * x))
+        return linear_part + log_tanh_part
+    def get_config(self): return super(AdaptiveLinearLogTanh, self).get_config()
+
+
 # --- Static Activation Functions (Keras Layers for consistency) ---
 # These do not have trainable parameters but are wrapped as Layers for uniform usage.
 
