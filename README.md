@@ -128,7 +128,7 @@ actix.plot_derivative('GeneralizedAlphaSigmoid', framework='tf')
 
 ## Documentation
 
-For complete function list and mathematical formulas, see [`actix/activations_tf.py`](actix/activations_tf.py).
+For complete function list and mathematical formulas, see [`actix/activations_tf.py`](actix/activations_tf.py)
 
 For detailed benchmarks, check:
 - [`cifar.ipynb`](/benchmark/cifar.ipynb)
