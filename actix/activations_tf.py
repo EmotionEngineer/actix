@@ -850,6 +850,122 @@ class AdaptiveLinearLogTanh(Layer):
         return linear_part + log_tanh_part
     def get_config(self): return super(AdaptiveLinearLogTanh, self).get_config()
 
+class AdaptiveArcTanSwish(Layer):
+    """f(x) = α·arctan(β·x) + γ·x·sigmoid(δ·x) + ε·tanh(ζ·x)"""
+    def __init__(self, **kwargs):
+        super(AdaptiveArcTanSwish, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_aats', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_aats', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_aats', shape=(), initializer=tf.keras.initializers.Constant(0.5), trainable=True)
+        self.delta = self.add_weight(name='delta_aats', shape=(), initializer='ones', trainable=True)
+        self.epsilon = self.add_weight(name='epsilon_aats', shape=(), initializer=tf.keras.initializers.Constant(0.3), trainable=True)
+        self.zeta = self.add_weight(name='zeta_aats', shape=(), initializer='ones', trainable=True)
+        super(AdaptiveArcTanSwish, self).build(input_shape)
+    def call(self, x):
+        arctan_part = self.alpha * tf.math.atan(self.beta * x)
+        swish_part = self.gamma * x * tf.math.sigmoid(self.delta * x)
+        tanh_part = self.epsilon * tf.math.tanh(self.zeta * x)
+        return arctan_part + swish_part + tanh_part
+    def get_config(self): return super(AdaptiveArcTanSwish, self).get_config()
+
+class StabilizedHarmonic(Layer):
+    """f(x) = α·tanh(β·x) + γ·sin(δ·tanh(ε·x)) + ζ·x·sigmoid(η·x)"""
+    def __init__(self, **kwargs):
+        super(StabilizedHarmonic, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_sh', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_sh', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_sh', shape=(), initializer=tf.keras.initializers.Constant(0.2), trainable=True)
+        self.delta = self.add_weight(name='delta_sh', shape=(), initializer='ones', trainable=True)
+        self.epsilon = self.add_weight(name='epsilon_sh', shape=(), initializer='ones', trainable=True)
+        self.zeta = self.add_weight(name='zeta_sh', shape=(), initializer=tf.keras.initializers.Constant(0.5), trainable=True)
+        self.eta = self.add_weight(name='eta_sh', shape=(), initializer='ones', trainable=True)
+        super(StabilizedHarmonic, self).build(input_shape)
+    def call(self, x):
+        tanh_part = self.alpha * tf.math.tanh(self.beta * x)
+        sin_part = self.gamma * tf.math.sin(self.delta * tf.math.tanh(self.epsilon * x))
+        swish_part = self.zeta * x * tf.math.sigmoid(self.eta * x)
+        return tanh_part + sin_part + swish_part
+    def get_config(self): return super(StabilizedHarmonic, self).get_config()
+
+class RationalSwish(Layer):
+    """f(x) = (α·x·sigmoid(β·x)) / (1 + |γ·x|^δ) + ε·arctan(ζ·x)"""
+    def __init__(self, **kwargs):
+        super(RationalSwish, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_rs', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_rs', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_rs', shape=(), initializer='ones', trainable=True)
+        self.delta = self.add_weight(name='delta_rs', shape=(), initializer=tf.keras.initializers.Constant(1.5), trainable=True)
+        self.epsilon = self.add_weight(name='epsilon_rs', shape=(), initializer=tf.keras.initializers.Constant(0.3), trainable=True)
+        self.zeta = self.add_weight(name='zeta_rs', shape=(), initializer='ones', trainable=True)
+        super(RationalSwish, self).build(input_shape)
+    def call(self, x):
+        swish_numerator = self.alpha * x * tf.math.sigmoid(self.beta * x)
+        rational_denominator = 1.0 + tf.math.pow(tf.math.abs(self.gamma * x) + 1e-7, tf.math.abs(self.delta))
+        rational_part = swish_numerator / (rational_denominator + 1e-7)
+        arctan_part = self.epsilon * tf.math.atan(self.zeta * x)
+        return rational_part + arctan_part
+    def get_config(self): return super(RationalSwish, self).get_config()
+
+class AdaptiveGatedUnit(Layer):
+    """f(x) = α·x·sigmoid(β·x) + γ·x·tanh(δ·x) + ε·arctan(ζ·x)"""
+    def __init__(self, **kwargs):
+        super(AdaptiveGatedUnit, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_agu', shape=(), initializer=tf.keras.initializers.Constant(0.4), trainable=True)
+        self.beta = self.add_weight(name='beta_agu', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_agu', shape=(), initializer=tf.keras.initializers.Constant(0.4), trainable=True)
+        self.delta = self.add_weight(name='delta_agu', shape=(), initializer='ones', trainable=True)
+        self.epsilon = self.add_weight(name='epsilon_agu', shape=(), initializer=tf.keras.initializers.Constant(0.2), trainable=True)
+        self.zeta = self.add_weight(name='zeta_agu', shape=(), initializer='ones', trainable=True)
+        super(AdaptiveGatedUnit, self).build(input_shape)
+    def call(self, x):
+        sigmoid_gate = self.alpha * x * tf.math.sigmoid(self.beta * x)
+        tanh_gate = self.gamma * x * tf.math.tanh(self.delta * x)
+        arctan_part = self.epsilon * tf.math.atan(self.zeta * x)
+        return sigmoid_gate + tanh_gate + arctan_part
+    def get_config(self): return super(AdaptiveGatedUnit, self).get_config()
+
+class ExponentialArcTan(Layer):
+    """f(x) = α·arctan(β·x) + γ·x·exp(-δ·|x|) + ε·sigmoid(ζ·x)"""
+    def __init__(self, **kwargs):
+        super(ExponentialArcTan, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_eat', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_eat', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_eat', shape=(), initializer=tf.keras.initializers.Constant(0.5), trainable=True)
+        self.delta = self.add_weight(name='delta_eat', shape=(), initializer=tf.keras.initializers.Constant(0.1), trainable=True)
+        self.epsilon = self.add_weight(name='epsilon_eat', shape=(), initializer=tf.keras.initializers.Constant(0.3), trainable=True)
+        self.zeta = self.add_weight(name='zeta_eat', shape=(), initializer='ones', trainable=True)
+        super(ExponentialArcTan, self).build(input_shape)
+    def call(self, x):
+        arctan_part = self.alpha * tf.math.atan(self.beta * x)
+        exp_decay = self.gamma * x * tf.math.exp(-tf.math.abs(self.delta * x))
+        sigmoid_part = self.epsilon * tf.math.sigmoid(self.zeta * x)
+        return arctan_part + exp_decay + sigmoid_part
+    def get_config(self): return super(ExponentialArcTan, self).get_config()
+
+class OptimQ(Layer):
+    """OptimQ: f(x) = α·arctan(β·x) + γ·x·sigmoid(δ·x) + ε·softplus(ζ·x)·tanh(η·x)"""
+    def __init__(self, **kwargs):
+        super(OptimQ, self).__init__(**kwargs)
+    def build(self, input_shape):
+        self.alpha = self.add_weight(name='alpha_oq', shape=(), initializer='ones', trainable=True)
+        self.beta = self.add_weight(name='beta_oq', shape=(), initializer='ones', trainable=True)
+        self.gamma = self.add_weight(name='gamma_oq', shape=(), initializer=tf.keras.initializers.Constant(0.6), trainable=True)
+        self.delta = self.add_weight(name='delta_oq', shape=(), initializer='ones', trainable=True)
+        self.epsilon = self.add_weight(name='epsilon_oq', shape=(), initializer=tf.keras.initializers.Constant(0.4), trainable=True)
+        self.zeta = self.add_weight(name='zeta_oq', shape=(), initializer=tf.keras.initializers.Constant(0.5), trainable=True)
+        self.eta = self.add_weight(name='eta_oq', shape=(), initializer='ones', trainable=True)
+        super(OptimQ, self).build(input_shape)
+    def call(self, x):
+        arctan_part = self.alpha * tf.math.atan(self.beta * x)
+        swish_part = self.gamma * x * tf.math.sigmoid(self.delta * x)
+        gated_softplus = self.epsilon * tf.math.softplus(self.zeta * x) * tf.math.tanh(self.eta * x)
+        return arctan_part + swish_part + gated_softplus
+    def get_config(self): return super(OptimQ, self).get_config()
 
 # --- Static Activation Functions (Keras Layers for consistency) ---
 # These do not have trainable parameters but are wrapped as Layers for uniform usage.

@@ -671,6 +671,104 @@ class AdaptiveLinearLogTanhTorch(nn.Module):
         log_tanh_part = self.beta * torch.tanh(self.gamma * F.softplus(self.delta * x))
         return linear_part + log_tanh_part
 
+class AdaptiveArcTanSwishTorch(nn.Module):
+    """f(x) = α·arctan(β·x) + γ·x·sigmoid(δ·x) + ε·tanh(ζ·x)"""
+    def __init__(self):
+        super(AdaptiveArcTanSwishTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.full((1,), 0.5))
+        self.delta = nn.Parameter(torch.ones(1))
+        self.epsilon = nn.Parameter(torch.full((1,), 0.3))
+        self.zeta = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        arctan_part = self.alpha * torch.atan(self.beta * x)
+        swish_part = self.gamma * x * torch.sigmoid(self.delta * x)
+        tanh_part = self.epsilon * torch.tanh(self.zeta * x)
+        return arctan_part + swish_part + tanh_part
+
+class StabilizedHarmonicTorch(nn.Module):
+    """f(x) = α·tanh(β·x) + γ·sin(δ·tanh(ε·x)) + ζ·x·sigmoid(η·x)"""
+    def __init__(self):
+        super(StabilizedHarmonicTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.full((1,), 0.2))
+        self.delta = nn.Parameter(torch.ones(1))
+        self.epsilon = nn.Parameter(torch.ones(1))
+        self.zeta = nn.Parameter(torch.full((1,), 0.5))
+        self.eta = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        tanh_part = self.alpha * torch.tanh(self.beta * x)
+        sin_part = self.gamma * torch.sin(self.delta * torch.tanh(self.epsilon * x))
+        swish_part = self.zeta * x * torch.sigmoid(self.eta * x)
+        return tanh_part + sin_part + swish_part
+
+class RationalSwishTorch(nn.Module):
+    """f(x) = (α·x·sigmoid(β·x)) / (1 + |γ·x|^δ) + ε·arctan(ζ·x)"""
+    def __init__(self):
+        super(RationalSwishTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.ones(1))
+        self.delta = nn.Parameter(torch.full((1,), 1.5))
+        self.epsilon = nn.Parameter(torch.full((1,), 0.3))
+        self.zeta = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        swish_numerator = self.alpha * x * torch.sigmoid(self.beta * x)
+        rational_denominator = 1.0 + torch.pow(torch.abs(self.gamma * x) + 1e-7, torch.abs(self.delta))
+        rational_part = swish_numerator / (rational_denominator + 1e-7)
+        arctan_part = self.epsilon * torch.atan(self.zeta * x)
+        return rational_part + arctan_part
+
+class AdaptiveGatedUnitTorch(nn.Module):
+    """f(x) = α·x·sigmoid(β·x) + γ·x·tanh(δ·x) + ε·arctan(ζ·x)"""
+    def __init__(self):
+        super(AdaptiveGatedUnitTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.full((1,), 0.4))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.full((1,), 0.4))
+        self.delta = nn.Parameter(torch.ones(1))
+        self.epsilon = nn.Parameter(torch.full((1,), 0.2))
+        self.zeta = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        sigmoid_gate = self.alpha * x * torch.sigmoid(self.beta * x)
+        tanh_gate = self.gamma * x * torch.tanh(self.delta * x)
+        arctan_part = self.epsilon * torch.atan(self.zeta * x)
+        return sigmoid_gate + tanh_gate + arctan_part
+
+class ExponentialArcTanTorch(nn.Module):
+    """f(x) = α·arctan(β·x) + γ·x·exp(-δ·|x|) + ε·sigmoid(ζ·x)"""
+    def __init__(self):
+        super(ExponentialArcTanTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.full((1,), 0.5))
+        self.delta = nn.Parameter(torch.full((1,), 0.1))
+        self.epsilon = nn.Parameter(torch.full((1,), 0.3))
+        self.zeta = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        arctan_part = self.alpha * torch.atan(self.beta * x)
+        exp_decay = self.gamma * x * torch.exp(-torch.abs(self.delta * x))
+        sigmoid_part = self.epsilon * torch.sigmoid(self.zeta * x)
+        return arctan_part + exp_decay + sigmoid_part
+
+class OptimQTorch(nn.Module):
+    """OptimQ: f(x) = α·arctan(β·x) + γ·x·sigmoid(δ·x) + ε·softplus(ζ·x)·tanh(η·x)"""
+    def __init__(self):
+        super(OptimQTorch, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1))
+        self.beta = nn.Parameter(torch.ones(1))
+        self.gamma = nn.Parameter(torch.full((1,), 0.6))
+        self.delta = nn.Parameter(torch.ones(1))
+        self.epsilon = nn.Parameter(torch.full((1,), 0.4))
+        self.zeta = nn.Parameter(torch.full((1,), 0.5))
+        self.eta = nn.Parameter(torch.ones(1))
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        arctan_part = self.alpha * torch.atan(self.beta * x)
+        swish_part = self.gamma * x * torch.sigmoid(self.delta * x)
+        gated_softplus = self.epsilon * F.softplus(self.zeta * x) * torch.tanh(self.eta * x)
+        return arctan_part + swish_part + gated_softplus
 
 # --- Static Activation Functions (PyTorch Modules for consistency) ---
 

@@ -26,7 +26,9 @@ try:
         ParametricLogarithmicSwishTorch, AdaptiveCubicSigmoidTorch, SmoothedAbsoluteGatedUnitTorch,
         GaussianTanhHarmonicUnitTorch, SymmetricParametricRationalSigmoidTorch, AdaptivePolynomialSwishTorch,
         LogSigmoidGatedEluTorch, AdaptiveBipolarExponentialUnitTorch, ParametricHyperGaussianGateTorch,
-        TanhGatedArcsinhLinearUnitTorch, ParametricOddPowerSwishTorch, AdaptiveLinearLogTanhTorch
+        TanhGatedArcsinhLinearUnitTorch, ParametricOddPowerSwishTorch, AdaptiveLinearLogTanhTorch,
+        AdaptiveArcTanSwishTorch, StabilizedHarmonicTorch, RationalSwishTorch,
+        AdaptiveGatedUnitTorch, ExponentialArcTanTorch, OptimQTorch
     )
     from actix import get_activation
     torch_available = True
@@ -52,7 +54,9 @@ ALL_TORCH_ACTIVATION_CLASSES = [
     ParametricLogarithmicSwishTorch, AdaptiveCubicSigmoidTorch, SmoothedAbsoluteGatedUnitTorch,
     GaussianTanhHarmonicUnitTorch, SymmetricParametricRationalSigmoidTorch, AdaptivePolynomialSwishTorch,
     LogSigmoidGatedEluTorch, AdaptiveBipolarExponentialUnitTorch, ParametricHyperGaussianGateTorch,
-    TanhGatedArcsinhLinearUnitTorch, ParametricOddPowerSwishTorch, AdaptiveLinearLogTanhTorch
+    TanhGatedArcsinhLinearUnitTorch, ParametricOddPowerSwishTorch, AdaptiveLinearLogTanhTorch,
+    AdaptiveArcTanSwishTorch, StabilizedHarmonicTorch, RationalSwishTorch,
+    AdaptiveGatedUnitTorch, ExponentialArcTanTorch, OptimQTorch
 ]
 
 @pytest.mark.skipif(not torch_available, reason="PyTorch not installed")
@@ -73,8 +77,8 @@ def test_torch_activation_output_properties(activation_class):
 @pytest.mark.skipif(not torch_available, reason="PyTorch not installed")
 def test_get_activation_torch_custom():
     """Tests the get_activation function for a custom Torch activation."""
-    act = get_activation('SwishLogTanh', framework='torch')
-    assert isinstance(act, SwishLogTanhTorch)
+    act = get_activation('OptimQ', framework='torch')
+    assert isinstance(act, OptimQTorch)
 
 @pytest.mark.skipif(not torch_available, reason="PyTorch not installed")
 def test_get_activation_torch_standard():

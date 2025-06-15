@@ -42,7 +42,9 @@ if _TF_AVAILABLE:
         ParametricLogarithmicSwish, AdaptiveCubicSigmoid, SmoothedAbsoluteGatedUnit,
         GaussianTanhHarmonicUnit, SymmetricParametricRationalSigmoid, AdaptivePolynomialSwish,
         LogSigmoidGatedElu, AdaptiveBipolarExponentialUnit, ParametricHyperGaussianGate,
-        TanhGatedArcsinhLinearUnit, ParametricOddPowerSwish, AdaptiveLinearLogTanh
+        TanhGatedArcsinhLinearUnit, ParametricOddPowerSwish, AdaptiveLinearLogTanh,
+        AdaptiveArcTanSwish, StabilizedHarmonic, RationalSwish, AdaptiveGatedUnit,
+        ExponentialArcTan, OptimQ
     )
     # Dictionary for convenient access by string name in TensorFlow
     tf_activations_map = {
@@ -101,6 +103,12 @@ if _TF_AVAILABLE:
         'TanhGatedArcsinhLinearUnit': TanhGatedArcsinhLinearUnit,
         'ParametricOddPowerSwish': ParametricOddPowerSwish,
         'AdaptiveLinearLogTanh': AdaptiveLinearLogTanh,
+        'AdaptiveArcTanSwish': AdaptiveArcTanSwish,
+        'StabilizedHarmonic': StabilizedHarmonic,
+        'RationalSwish': RationalSwish,
+        'AdaptiveGatedUnit': AdaptiveGatedUnit,
+        'ExponentialArcTan': ExponentialArcTan,
+        'OptimQ': OptimQ,
     }
 else:
     tf_activations_map = {}
@@ -127,7 +135,9 @@ if _TORCH_AVAILABLE:
         ParametricLogarithmicSwishTorch, AdaptiveCubicSigmoidTorch, SmoothedAbsoluteGatedUnitTorch,
         GaussianTanhHarmonicUnitTorch, SymmetricParametricRationalSigmoidTorch, AdaptivePolynomialSwishTorch,
         LogSigmoidGatedEluTorch, AdaptiveBipolarExponentialUnitTorch, ParametricHyperGaussianGateTorch,
-        TanhGatedArcsinhLinearUnitTorch, ParametricOddPowerSwishTorch, AdaptiveLinearLogTanhTorch
+        TanhGatedArcsinhLinearUnitTorch, ParametricOddPowerSwishTorch, AdaptiveLinearLogTanhTorch,
+        AdaptiveArcTanSwishTorch, StabilizedHarmonicTorch, RationalSwishTorch,
+        AdaptiveGatedUnitTorch, ExponentialArcTanTorch, OptimQTorch
     )
     # Dictionary for convenient access by string name in PyTorch
     torch_activations_map = {
@@ -186,6 +196,12 @@ if _TORCH_AVAILABLE:
         'TanhGatedArcsinhLinearUnit': TanhGatedArcsinhLinearUnitTorch,
         'ParametricOddPowerSwish': ParametricOddPowerSwishTorch,
         'AdaptiveLinearLogTanh': AdaptiveLinearLogTanhTorch,
+        'AdaptiveArcTanSwish': AdaptiveArcTanSwishTorch,
+        'StabilizedHarmonic': StabilizedHarmonicTorch,
+        'RationalSwish': RationalSwishTorch,
+        'AdaptiveGatedUnit': AdaptiveGatedUnitTorch,
+        'ExponentialArcTan': ExponentialArcTanTorch,
+        'OptimQ': OptimQTorch,
     }
 else:
     torch_activations_map = {}
@@ -252,7 +268,7 @@ def get_activation(name: str, framework: str = 'tensorflow'):
 from .utils import plot_activation, plot_derivative
 
 __all__ = ['get_activation', 'plot_activation', 'plot_derivative']
-__version__ = "0.4.0" # Bumped version for new features
+__version__ = "0.5.0" # Bumped version for new features
 
 if _TF_AVAILABLE:
     for act_name, act_class in tf_activations_map.items():
