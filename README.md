@@ -45,7 +45,7 @@ activation = get_activation('OptimA', framework='tensorflow')
 ### PyTorch
 
 ```python
-from actix import OptimATorch, ATanSigmoidTorch, get_activation
+from actix import OptimATorch, ATanSigmoidTorch
 import torch.nn as nn
 
 class Model(nn.Module):
@@ -66,46 +66,47 @@ class Model(nn.Module):
 ## Recommended Activations
 
 ### Universal Top Performers
-- **`ATanSigU`** - Best overall, excels in classification (77.63% on CIFAR-10)
-- **`A_ELuC`** - Consistently strong across all task types
+
+| Function | Key Strength | Best Use Case |
+|----------|--------------|---------------|
+| **`ATanSigU`** | Best overall performance | General-purpose, especially classification (77.63% on CIFAR-10) |
+| **`A_ELuC`** | Consistent across tasks | When you need reliable performance everywhere |
 
 ### Classification Leaders
-1. **`ATanSigU`** - 77.63% accuracy
-2. **`AdaptiveSinusoidalSoftgate`** - 77.52%
-3. **`ParametricLogish`** - 77.48%
-4. **`SmoothedAbsoluteGatedUnit`** - 77.43%
-5. **`A_ELuC`** - 77.21%
+
+| Rank | Activation Function | CIFAR-10 Accuracy |
+|------|-------------------|-------------------|
+| 1 | **`ATanSigU`** | 77.63% |
+| 2 | **`AdaptiveSinusoidalSoftgate`** | 77.52% |
+| 3 | **`ParametricLogish`** | 77.48% |
+| 4 | **`SmoothedAbsoluteGatedUnit`** | 77.43% |
+| 5 | **`A_ELuC`** | 77.21% |
 
 ### Regression Champions
 
-**California Housing:**
-1. **`SymmetricParametricRationalSigmoid`** - 0.2183 MSE
-2. **`OptimA`** - 0.2211 MSE
-3. **`OptimXTemporal`** - 0.2213 MSE
+#### California Housing Dataset
 
-**Diabetes:**
-1. **`ParametricBetaSoftsign`** - 0.4564 MSE
-2. **`A_ELuC`** - 0.4567 MSE
-3. **`SmoothedAbsoluteGatedUnit`** - 0.4590 MSE
+| Rank | Activation Function | MSE | Improvement vs Baseline |
+|------|-------------------|-----|------------------------|
+| 1 | **`SymmetricParametricRationalSigmoid`** | 0.2183 | -17.75% |
+| 2 | **`OptimA`** | 0.2211 | -16.70% |
+| 3 | **`OptimXTemporal`** | 0.2213 | -16.62% |
+
+#### Diabetes Dataset
+
+| Rank | Activation Function | MSE | Improvement vs Baseline |
+|------|-------------------|-----|------------------------|
+| 1 | **`ParametricBetaSoftsign`** | 0.4564 | -2.37% |
+| 2 | **`A_ELuC`** | 0.4567 | -2.31% |
+| 3 | **`SmoothedAbsoluteGatedUnit`** | 0.4590 | -1.82% |
 
 ### Experimental Functions
-- **`ComplexHarmonicActivation`** - Powerful but requires careful tuning
-- **`WeibullSoftplusActivation`** - Stable fallback option
-- **`GeneralizedAlphaSigmoid`** - Strong in specific scenarios
 
-## Performance Benchmarks
-
-### CIFAR-10 Classification
-- Top 5 positions dominated by actix functions
-- Best: `ATanSigU` (77.63%) vs standard `swish` (77.03%)
-
-### California Housing Regression
-- Up to 17.75% MSE reduction vs standard activations
-- Best: `SymmetricParametricRationalSigmoid` (0.2183) vs `sigmoid` (0.2654)
-
-### Diabetes Regression
-- 4 of top 5 positions held by actix functions
-- Best: `ParametricBetaSoftsign` (0.4564) vs `sigmoid` (0.4675)
+| Function | Characteristics | Recommended For |
+|----------|----------------|-----------------|
+| **`ComplexHarmonicActivation`** | High potential, sensitive to hyperparameters | Advanced users, research projects |
+| **`WeibullSoftplusActivation`** | Stable, predictable behavior | Production systems requiring reliability |
+| **`GeneralizedAlphaSigmoid`** | Task-specific optimization | Specialized applications |
 
 ## Visualization Tools
 
