@@ -268,7 +268,7 @@ def get_activation(name: str, framework: str = 'tensorflow'):
 from .utils import plot_activation, plot_derivative
 
 __all__ = ['get_activation', 'plot_activation', 'plot_derivative']
-__version__ = "0.5.0" # Bumped version for new features
+__version__ = "0.5.0"
 
 if _TF_AVAILABLE:
     for act_name, act_class in tf_activations_map.items():
