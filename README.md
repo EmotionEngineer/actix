@@ -102,14 +102,14 @@ class Model(nn.Module):
 
 ### Experimental Functions
 
-| Function | Characteristics | Recommended For |
+| Function | Characteristics | Application Domain |
 |----------|----------------|-----------------|
-| **`ComplexHarmonicActivation`** | High potential, sensitive to hyperparameters | Advanced users, research projects |
-| **`WeibullSoftplusActivation`** | Stable, predictable behavior | Production systems requiring reliability |
-| **`GeneralizedAlphaSigmoid`** | Task-specific optimization | Specialized applications |
-| **`OptimQ`** | Multi-component hybrid (arctan + swish + gated softplus), 7 learnable parameters | Research projects requiring maximum expressiveness |
-| **`StabilizedHarmonic`** | Harmonic oscillations with swish gating, stable training dynamics | Applications needing periodic behavior modeling |
-| **`AdaptiveArcTanSwish`** | Balanced arctan-swish-tanh combination, excellent for regression | Regression tasks and smooth function approximation |
+| **`ComplexHarmonicActivation`** | Demonstrates significant potential, requires precise hyperparameter optimization | Advanced research applications with computational flexibility |
+| **`WeibullSoftplusActivation`** | Exhibits robust performance with predictable convergence properties | Production systems requiring high stability and reliability |
+| **`GeneralizedAlphaSigmoid`** | Provides domain-specific adaptability through parameterization | Specialized tasks requiring function customization |
+| **`OptimQ`** | Integrates three activation mechanisms with extensive configurability | Complex architectures demanding high adaptability |
+| **`StabilizedHarmonic`** | Captures periodic patterns while maintaining numerical stability | Temporal modeling, signal processing, and cyclic phenomena |
+| **`AdaptiveArcTanSwish`** | Achieves optimal balance between computational efficiency and expressiveness | Regression tasks requiring enhanced performance |
 
 ## Visualization Tools
 
