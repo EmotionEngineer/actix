@@ -107,6 +107,9 @@ class Model(nn.Module):
 | **`ComplexHarmonicActivation`** | High potential, sensitive to hyperparameters | Advanced users, research projects |
 | **`WeibullSoftplusActivation`** | Stable, predictable behavior | Production systems requiring reliability |
 | **`GeneralizedAlphaSigmoid`** | Task-specific optimization | Specialized applications |
+| **`OptimQ`** | Multi-component hybrid (arctan + swish + gated softplus), 7 learnable parameters | Research projects requiring maximum expressiveness |
+| **`StabilizedHarmonic`** | Harmonic oscillations with swish gating, stable training dynamics | Applications needing periodic behavior modeling |
+| **`AdaptiveArcTanSwish`** | Balanced arctan-swish-tanh combination, excellent for regression | Regression tasks and smooth function approximation |
 
 ## Visualization Tools
 
